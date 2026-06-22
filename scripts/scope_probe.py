@@ -6,8 +6,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-BASE = os.getenv("base_url", "https://staging-portal.eprospera.com")
-AK = os.getenv("myAgentToken")
+BASE = (
+    os.getenv("PROSPERA_BASE_URL")
+    or os.getenv("base_url")
+    or "https://staging-portal.eprospera.com"
+)
+AK = os.getenv("PROSPERA_AGENT_TOKEN") or os.getenv("myAgentToken")
 H = {"Authorization": f"Bearer {AK}", "Content-Type": "application/json"}
 
 SAMPLE_RPN = "80000000000012"
