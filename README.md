@@ -38,7 +38,10 @@ Prospera/
 │   ├── config.py         # loads credentials from .env
 │   ├── api.py            # ProsperaClient — HTTP calls to the API
 │   ├── profile.py        # pure helpers that format profile/residency data
+│   ├── app.py            # Streamlit entry point (`streamlit run src/verify_me/app.py`)
+│   ├── ui/              # Streamlit render helpers + cached data access
 │   └── __main__.py       # `python -m verify_me` entry point
+├── .streamlit/           # Streamlit theme + server config
 ├── scripts/
 │   └── scope_probe.py    # exploratory tool: which API scopes do our tokens have
 ├── tests/
@@ -70,12 +73,29 @@ for the full guide.
 
 ### Run it
 
+**Web app (Streamlit) — the live verification badge:**
+
+```bash
+pip install -e ".[ui]"                 # adds Streamlit (first time only)
+streamlit run src/verify_me/app.py     # opens http://localhost:8501
+```
+
+Shows a live badge from your Prospera data: **green** for active residency,
+**red** if not, your name + RPN, a loading spinner, and friendly `st.error`
+messages (never a raw traceback). If your `natural-person` profile is empty,
+it shows a "complete your profile" notice until you fill it in via the portal.
+
+**CLI summary:**
+
 ```bash
 python -m verify_me
 ```
 
 Authenticates against the Prospera API and prints your profile and residency
 status.
+
+See [setup.md](docs/setup.md#run-everything--quick-reference) for the full
+"run everything" reference.
 
 ### Test
 
@@ -90,8 +110,8 @@ Credentials are read from a local `.env` file (copy from `.env.example`):
 | Variable | Meaning |
 |----------|---------|
 | `PROSPERA_BASE_URL` | API base URL (staging: `https://staging-portal.eprospera.com`) |
-| `PROSPERA_API_TOKEN` | Personal user token (`sk-...`) — authenticates `/me` calls |
-| `PROSPERA_AGENT_TOKEN` | Agent token (`ak-...`) — used by the scope probe |
+| `PROSPERA_API_TOKEN` | Personal user token (`sk-...`) — standard key for other endpoints |
+| `PROSPERA_AGENT_TOKEN` | Agent token (`ak-...`) — authenticates the `/me` profile + residency calls and the scope probe |
 
 ## Roadmap
 

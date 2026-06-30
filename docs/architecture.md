@@ -9,7 +9,14 @@ Prospera/
 │   ├── __main__.py         # entry point for `python -m verify_me`
 │   ├── config.py           # loads credentials/settings from .env
 │   ├── api.py              # ProsperaClient — HTTP calls to the Prospera API
-│   └── profile.py          # pure helpers that format profile/residency data
+│   ├── profile.py          # pure helpers that format profile/residency data
+│   ├── app.py              # Streamlit entry point (week 3); `streamlit run src/verify_me/app.py`
+│   └── ui/                 # Streamlit UI subpackage (render helpers + cached data access)
+│       ├── __init__.py     # re-exports the public render_* helpers + data seams
+│       ├── components.py   # render_header/sidebar/badge/profile
+│       └── data.py         # cached get_client() / load_identity()
+├── .streamlit/
+│   └── config.toml         # Streamlit theme (branded palette) + server defaults
 ├── scripts/
 │   └── scope_probe.py      # standalone tool: probe which API scopes the tokens have
 ├── tests/
@@ -39,6 +46,9 @@ project can grow through the 6-week roadmap without tangling.
 | `api.py` | `ProsperaClient` — wrap the Prospera REST endpoints we use, add bearer auth, return parsed JSON, surface HTTP errors. | **Yes** |
 | `profile.py` | Pure functions that turn API dicts into human-readable strings (e.g. `residency_status()`, `format_profile()`). No I/O. | No |
 | `__main__.py` | Wire it together for week 2: build a client, fetch profile + residency, print a summary. | Indirectly (via `api`) |
+| `app.py` | Streamlit entry point (week 3). Sets page config and composes the `ui` render helpers. No env reads or HTTP itself. | No |
+| `ui/components.py` | Reusable `render_*` helpers: header, sidebar, verification badge, profile. Take dicts, draw widgets; format via `profile`. | No |
+| `ui/data.py` | Streamlit-cached data-access seams: `get_client()` (`cache_resource`) and `load_identity()` (`cache_data`). The only UI module touching `config`/`api`. | Indirectly (via `api`) |
 | `scripts/scope_probe.py` | One-off exploration tool, independent of the package; reports endpoint reachability per scope. | **Yes** |
 
 ## Data flow (week 2 target)

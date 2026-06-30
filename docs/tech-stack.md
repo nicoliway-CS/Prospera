@@ -9,7 +9,7 @@
 | Config | **python-dotenv** | in use | Load secrets from `.env` |
 | Packaging | **setuptools** + `pyproject.toml` | in use | `src/` layout, editable install |
 | Testing | **pytest** | configured | Unit tests for pure helpers |
-| Web UI | **Streamlit** | planned (week 3) | Browser interface + verification badge |
+| Web UI | **Streamlit** | scaffolded (week 3) | Browser interface + verification badge |
 | Face match | **DeepFace** | planned (week 5) | Compare official photo vs. live selfie |
 | VCS / release | **Git + GitHub** | in use | Source control; tagged release in week 6 |
 
@@ -31,11 +31,17 @@ Pinned transitive runtime deps live in `requirements.txt`
 (`certifi`, `charset-normalizer`, `idna`, `urllib3` alongside `requests` and
 `python-dotenv`).
 
+## Scaffolded (optional extra, not in base install)
+
+- **Streamlit** (`>=1.40`, `ui` extra) — turns the script into a web app: a page
+  that shows a live verification badge from real data, and later hosts the
+  webcam selfie capture. The UI is scaffolded under `src/verify_me/ui/` with a
+  branded theme in `.streamlit/config.toml`. It is a deferred dependency
+  (`pip install -e ".[ui]"`), kept out of the pinned base install. The page
+  becomes fully live once the week-2 `config`/`api`/`profile` stubs are filled in.
+
 ## Planned (not yet installed)
 
-- **Streamlit** (week 3) — turns the script into a web app: a page that shows a
-  live verification badge from real data, and later hosts the webcam selfie
-  capture.
 - **DeepFace** (week 5) — the ML core. Runs face detection + embedding +
   comparison between the official Prospera photo and the captured selfie, with a
   tunable match threshold. Pulls in heavier transitive dependencies (e.g. a
