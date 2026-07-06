@@ -26,9 +26,11 @@ import logging
 import streamlit as st
 
 from verify_me.ui import (
+    load_face_photo,
     load_identity,
     render_badge,
     render_header,
+    render_photo,
     render_profile,
     render_sidebar,
 )
@@ -56,6 +58,17 @@ def main() -> None:
         render_badge(person, residency)
         if person:  # skip the detail block until the profile is filled out
             render_profile(person, residency)
+
+            # The official photo is fetched in its own guard: a failure here
+            # (missing scope, expired signed URL, or no verification on file)
+            # must not take down the badge + profile rendered above. download_image
+            # already scrubs the signed URL, so logging the traceback is safe.
+            try:
+                photo = load_face_photo()
+            except Exception:
+                logger.exception("Failed to load official photo")
+                photo = None
+            render_photo(photo)
     except Exception:
         logger.exception("Failed to load/render Prospera identity")
         st.error(

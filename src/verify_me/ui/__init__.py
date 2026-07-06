@@ -7,16 +7,19 @@ point can do ``from verify_me.ui import render_header, load_identity, ...``.
 from .components import (
     render_badge,
     render_header,
+    render_photo,
     render_profile,
     render_sidebar,
 )
-from .data import get_client, load_identity
+from .data import get_client, load_face_photo, load_identity
 
 __all__ = [
     "render_header",
     "render_sidebar",
     "render_badge",
     "render_profile",
+    "render_photo",
     "get_client",
     "load_identity",
+    "load_face_photo",
 ]

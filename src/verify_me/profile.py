@@ -36,3 +36,16 @@ def format_profile(person, residency):
         f"Citizenship: {', '.join(citizenships) if citizenships else '—'}",
     ]
     return "\n".join(lines)
+
+
+def face_photo_url(id_verification):
+    """Return the signed selfie-photo URL from an id-verification response, or None.
+
+    See ``docs/api-reference.md``: ``documents.face`` is a signed URL for the
+    selfie image, but it is ``null`` when there's no approved verification on file
+    (the whole response comes back all-null). Read defensively so a sparse or
+    missing ``documents`` object yields ``None`` rather than raising.
+    """
+    id_verification = id_verification or {}
+    documents = id_verification.get("documents") or {}
+    return documents.get("face") or None
