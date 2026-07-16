@@ -79,8 +79,23 @@ def render_profile(person: dict, residency: dict) -> None:
     st.subheader("Profile")
     st.text(profile.format_profile(person, residency))
 
-    # TODO (week 4): fetch and display the official face photo alongside this,
-    # e.g. st.image(client.get_id_photo(), caption="Official photo").
-
     with st.expander("Raw API response"):
         st.json({"natural-person": person, "residency": residency})
+
+
+def render_photo(photo: bytes | None) -> None:
+    """Show the official ID selfie photo, or a friendly note if none is on file.
+
+    The photo is the reference image the week-5 face match will compare a live
+    selfie against. ``photo`` is ``None`` when there's no approved verification on
+    file (``documents.face`` was null) or the fetch failed — both are expected
+    states here, not errors.
+    """
+    st.subheader("Official photo")
+    if photo:
+        st.image(photo, caption="Official ID photo", width=200)
+    else:
+        st.info(
+            "ℹ️ No official photo on file yet. Complete ID verification in the "
+            "e-Próspera portal, then use **Refresh data** in the sidebar."
+        )

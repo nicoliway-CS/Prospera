@@ -16,8 +16,8 @@ from __future__ import annotations
 
 import streamlit as st
 
-from verify_me import config
-from verify_me.api import ProsperaClient
+from verify_me import config, profile
+from verify_me.api import ProsperaClient, download_image
 
 
 @st.cache_resource(show_spinner=False)
@@ -40,3 +40,16 @@ def load_identity() -> tuple[dict, dict]:
     person = client.get_natural_person()
     residency = client.get_residency()
     return person, residency
+
+
+@st.cache_data(ttl=300, show_spinner="Fetching your official photo…")
+def load_face_photo() -> bytes | None:
+    """Fetch the official selfie-photo bytes, or ``None`` if none is on file.
+
+    We cache the downloaded **bytes**, not the signed URL: the URL expires in ~1h
+    and is sensitive, so it never enters the cache. A 5-minute TTL keeps a cached
+    photo comfortably inside the URL's lifetime for any re-fetch.
+    """
+    client = get_client()
+    url = profile.face_photo_url(client.get_id_verification())
+    return download_image(url) if url else None

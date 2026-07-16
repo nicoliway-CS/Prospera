@@ -102,6 +102,57 @@ Interpretation used by `profile.residency_status()`:
 | true | null | "Not active" |
 | false | null | "Never a resident" |
 
+### GET `/api/v1/me/natural-person/id-verification`
+
+Scope: `agent:person.id_verification.read` (agent key) — the personal `sk-` user
+token is not accepted. A compatibility alias with an underscore exists:
+`/api/v1/me/natural-person/id_verification`.
+
+Returns the user's **most recent approved** ID-verification session, including
+signed URLs for the captured document/selfie images. Used by Verify Me (week 4)
+for the official face photo.
+
+Example response shape:
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "type": "veriff",
+  "date": "2024-01-15T10:30:00.000Z",
+  "status": "approved",
+  "documents": {
+    "documentFront": "https://…signed…",
+    "documentBack": "https://…signed…",
+    "face": "https://…signed…"
+  }
+}
+```
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `id` | string \| null | Verification-session ID |
+| `type` | string \| null | Provider, e.g. `veriff` |
+| `date` | string \| null | Session timestamp |
+| `status` | string \| null | e.g. `approved` |
+| `documents.documentFront` | string \| null | Signed URL for the ID front image |
+| `documents.documentBack` | string \| null | Signed URL for the ID back (some ID types omit it) |
+| `documents.face` | string \| null | **Signed URL for the selfie image** — the official face photo |
+
+When there is **no verification on file**, every field (including
+`documents.face`) comes back `null`:
+
+```json
+{ "id": null, "type": null, "date": null, "status": null,
+  "documents": { "documentFront": null, "documentBack": null, "face": null } }
+```
+
+> **Signed URLs expire after ~1 hour** and grant temporary access to the image.
+> Treat them as secrets: never log them, and don't cache the URL long-term (Verify
+> Me downloads and caches the image *bytes* instead — see `verify_me.api.download_image`).
+
+Errors: `401` (`missing_token` / `invalid_token`), `403` (`missing_scopes` /
+insufficient permissions), `500` (server error).
+
 ### POST `/api/v1/verify_rpn`
 
 Scope: `agent:verify_rpn`. Verifies a Resident Permit Number.
@@ -119,17 +170,12 @@ depend on them today.
 
 | Method | Path | Scope |
 |--------|------|-------|
-| GET | `/api/v1/me/natural-person/id-verification` | `agent:person.id_verification.read` |
 | POST | `/api/v1/registries/legal_entities/search` | `agent:registry.search` |
 | GET | `/api/v1/legal_entities/{id}` | `agent:entity.read` |
 | GET | `/api/v1/legal_entities/{id}/documents` | `agent:entity.documents.read` |
 | GET | `/api/v1/legal_entity_applications` | `agent:entity.application.read` |
 | POST | `/api/v1/legal_entity_applications` | `agent:entity.application.create` |
 | POST | `/api/v1/legal_entity_applications/{id}/pay_voucher` | `agent:entity.application.pay` |
-
-> The **official face photo** needed in week 4 is expected to come from an
-> ID-verification / person endpoint; the exact field is still to be confirmed
-> against the live API.
 
 ## Error handling convention
 
